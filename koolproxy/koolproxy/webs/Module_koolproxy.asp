@@ -2,7 +2,6 @@
 Tomato GUI
 Copyright (C) 2006-2010 Jonathan Zarate
 http://www.polarcloud.com/tomato/
-
 For use with Tomato Firmware only.
 No part of this file may be used without permission.
 -->
@@ -61,7 +60,6 @@ No part of this file may be used without permission.
 					}
 				}
 			}
-
 		}
 		kpacl.fieldValuesToData = function( row ) {
 			var f = fields.getAll( row );
@@ -78,14 +76,11 @@ No part of this file may be used without permission.
 				
 			}
 		}
-
     	kpacl.onChange = function(which, cell) {
     	    return this.verifyFields((which == 'new') ? this.newEditor: this.editor, true, cell);
     	}
-
 		kpacl.verifyFields = function( row, quiet, cell) {
 			var f = fields.getAll( row );
-
 			if ( $(cell).attr("id") == "_[object HTMLTableElement]_1" ) {
 				if (f[0].value){
 					f[1].value = option_arp_list[f[0].selectedIndex][2];
@@ -102,7 +97,6 @@ No part of this file may be used without permission.
 			if (f[1].value && f[2].value){
 				return v_ip( f[1], quiet ) || v_mac( f[2], quiet );
 			}
-
 			if (f[0].value == "自定义"){
 				console.log("sucess!");
 				kpacl.updateUI;
@@ -110,15 +104,11 @@ No part of this file may be used without permission.
 		}
 		kpacl.onAdd = function() {
 			var data;
-
 			this.moving = null;
 			this.rpHide();
-
 			if (!this.verifyFields(this.newEditor, false)) return;
-
 			data = this.fieldValuesToData(this.newEditor);
 			this.insertData(1, data);
-
 			this.disableNewEditor(false);
 			this.resetNewEditor();
 		}
@@ -169,7 +159,6 @@ No part of this file may be used without permission.
 			});
 			setTimeout("get_run_status();", 1000);
 		}
-
 		function get_arp_list(){
 			var id = parseInt(Math.random() * 100000000);
 			var postData1 = {"id": id, "method": "KoolProxy_getarp.sh", "params":[], "fields": ""};
@@ -210,7 +199,6 @@ No part of this file may be used without permission.
 				timeout:1000
 			});
 		}
-
 		function unique_array(array){
 			var r = [];
 			for(var i = 0, l = array.length; i < l; i++) {
@@ -232,7 +220,6 @@ No part of this file may be used without permission.
 			  	}
 			});
 		}
-
 		function get_run_status(){
 			var id1 = parseInt(Math.random() * 100000000);
 			var postData1 = {"id": id1, "method": "KoolProxy_status.sh", "params":[2], "fields": ""};
@@ -260,7 +247,6 @@ No part of this file may be used without permission.
 				}
 			});
 		}	
-
 		function download_cert(){
 			location.href = "http://110.110.110.110";
 		}
@@ -293,9 +279,9 @@ No part of this file may be used without permission.
 		}
 		
 		function tabSelect(obj){
-			var tableX = ['app1-server1-jb-tab','app3-server1-kz-tab','app4-server1-zdy-tab','app5-server1-rz-tab'];
-			var boxX = ['boxr1','boxr3','boxr4','boxr5'];
-			var appX = ['app1','app3','app4','app5'];
+			var tableX = ['app1-server1-jb-tab','app3-server1-kz-tab','app4-server1-zdy-tab','app5-server1-zsgl-tab','app6-server1-rz-tab'];
+			var boxX = ['boxr1','boxr3','boxr4','boxr5','boxr6'];
+			var appX = ['app1','app3','app4','app5','app6'];
 			for (var i = 0; i < tableX.length; i++){
 				if(obj == appX[i]){
 					$('#'+tableX[i]).addClass('active');
@@ -305,21 +291,17 @@ No part of this file may be used without permission.
 					$('.'+boxX[i]).hide();
 				}
 			}
-			if(obj=='app5'){
+			if(obj=='app6'){
 				setTimeout("get_log();", 400);
 				elem.display('save-button', false);
-				elem.display('cancel-button', false);
 			}else{
 				elem.display('save-button', true);
-				elem.display('cancel-button', true);
 			}
 		}
-
 		function showMsg(Outtype, title, msg){
 			$('#'+Outtype).html('<h5>'+title+'</h5>'+msg+'<a class="close"><i class="icon-cancel"></i></a>');
 			$('#'+Outtype).show();
 		}
-
 		function save(){
 			verifyFields();
 			// collect basic data
@@ -364,7 +346,7 @@ No part of this file may be used without permission.
 				}
 			});
 			reload = 1;
-			tabSelect("app5");
+			tabSelect("app6");
 		}
 		
 		function get_log(){
@@ -402,7 +384,6 @@ No part of this file may be used without permission.
 				}
 			});
 		}
-
 		function get_user_txt() {
 			$.ajax({
 				url: '/_temp/user.txt',
@@ -414,20 +395,79 @@ No part of this file may be used without permission.
 				}
 			});
 		}
-
+		function kp_cert(script, arg){
+			tabSelect("app6");
+			var id = parseInt(Math.random() * 100000000);
+			var postData = {"id": id, "method": script, "params":[arg], "fields": ""};
+			$.ajax({
+				type: "POST",
+				url: "/_api/",
+				async: true,
+				cache:false,
+				data: JSON.stringify(postData),
+				dataType: "json",
+				success: function(response){
+					console.log("id", id);
+					console.log("response", response);
+					if (response.result == id){
+						if (arg == 1){
+							console.log("333");
+							var a = document.createElement('A');
+							a.href = "/files/koolproxyca.tar.gz";
+							a.download = 'koolproxyCA.tar.gz';
+							document.body.appendChild(a);
+							a.click();
+							document.body.removeChild(a);
+						}else if (arg == 2){
+							setTimeout("window.location.reload()", 1000);
+						}
+					}
+				}
+			});
+		}
+		function restore_cert(){
+			var filename = $("#file").val();
+			filename = filename.split('\\');
+			filename = filename[filename.length-1];
+			var filelast = filename.split('.');
+			filelast = filelast[filelast.length-1];
+			if(filelast !='gz'){
+				alert('恢复文件格式不正确！');
+				return false;
+			}
+			var formData = new FormData();
+			formData.append('koolproxyCA.tar.gz', $('#file')[0].files[0]);
+			$('.popover').html('正在恢复，请稍后……');
+			//changeButton(true);
+			$.ajax({
+				url: '/_upload',
+				type: 'POST',
+				async: true,
+				cache:false,
+				data: formData,
+				processData: false,
+				contentType: false,
+				complete:function(res){
+					if(res.status==200){
+						kp_cert('Koolproxy_cert.sh', 2);
+					}
+				}
+			});
+		}
 	</script>
 
 	<div class="box">
 		<div class="heading">KoolProxy<a href="#/soft-center.asp" class="btn" style="float:right;border-radius:3px;margin-right:5px;margin-top:0px;">返回</a></div>
 		<div class="content">
-			<span id="msg" class="col-sm-9" style="margin-top:10px;width:700px">koolproxy是能识别adblock规则的代理软件，可以用于去除网页静广告和视频广告，并且支持https！</span>
+			<span id="msg" class="col-sm-9" style="margin-top:10px;width:700px">koolproxy是一款高效的修改和过滤流量包的代理软件，可以用于去除网页静广告和视频广告，并且支持https！</span>
 		</div>	
 	</div>
 	<ul class="nav nav-tabs">
 		<li><a href="javascript:void(0);" onclick="tabSelect('app1');" id="app1-server1-jb-tab" class="active"><i class="icon-system"></i> 基本设置</a></li>
 		<li><a href="javascript:void(0);" onclick="tabSelect('app3');" id="app3-server1-kz-tab"><i class="icon-tools"></i> 访问控制</a></li>
 		<li><a href="javascript:void(0);" onclick="tabSelect('app4');" id="app4-server1-zdy-tab"><i class="icon-hammer"></i> 自定义规则</a></li>
-		<li><a href="javascript:void(0);" onclick="tabSelect('app5');" id="app5-server1-rz-tab"><i class="icon-info"></i> 日志信息</a></li>
+		<li><a href="javascript:void(0);" onclick="tabSelect('app5');" id="app5-server1-zsgl-tab"><i class="icon-lock"></i> 证书管理</a></li>		
+		<li><a href="javascript:void(0);" onclick="tabSelect('app6');" id="app6-server1-rz-tab"><i class="icon-info"></i> 日志信息</a></li>
 	</ul>
 	<div class="box boxr1" style="margin-top: 0px;">
 		<div class="heading">基本设置</div>
@@ -440,7 +480,7 @@ No part of this file may be used without permission.
 					{ title: 'Koolproxy规则状态', text: '<font id="_koolproxy_rule_status" name=_koolproxy_status color="#1bbf35">正在获取规则状态...</font>' },
 					{ title: '过滤模式', name:'koolproxy_mode',type:'select',options:[['1','全局模式'],['2','IPSET模式'],['3','视频模式']],value: dbus.koolproxy_mode || "1" },
 					{ title: '端口控制', name:'koolproxy_port',type:'select',options:[['0','关闭'],['1','开启']],value: dbus.koolproxy_port || "0" },					
-					{ title: '例外端口', name:'koolproxy_bp_port',type:'text',style:'input_style', maxlen:20, value:dbus.koolproxy_bp_port ,suffix: '<font color="#FF0000">单端口:80</font>&nbsp;&nbsp;&nbsp;&nbsp;<font color="#FF0000">多端口:80,443</font>'},
+					{ title: '例外端口', name:'koolproxy_bp_port',type:'text',style:'input_style', maxlen:20, value:dbus.koolproxy_bp_port ,suffix: '<font color="#FF0000">例：</font>&nbsp;&nbsp;<font color="#FF0000">【单端口】：80【多端口】：80,443</font>'},
 					{ title: '开启Adblock Plus Host', name:'koolproxy_host',type:'checkbox',value: dbus.koolproxy_host == 1, suffix: '<lable id="_koolproxy_host_nu"></lable>' },
 					{ title: '插件自动重启', multi: [
 						{ name:'koolproxy_reboot',type:'select',options:[['1','定时'],['2','间隔'],['0','关闭']],value: dbus.koolproxy_reboot || "0", suffix: ' &nbsp;&nbsp;' },
@@ -491,6 +531,18 @@ No part of this file may be used without permission.
 		</div>
 	</div>
 	<div class="box boxr5">
+		<div class="heading">证书管理</div>
+		<div class="content">
+			<div id="kp_certificate_management" class="section"></div>
+			<script type="text/javascript">
+				$('#kp_certificate_management').forms([
+					{ title: '证书备份', suffix: '<button onclick="kp_cert(\'Koolproxy_cert.sh\', 1);" class="btn btn-success">证书备份 <i class="icon-download"></i></button>' },
+					{ title: '证书恢复', suffix: '<input type="file" id="file" size="50">&nbsp;&nbsp;<button id="upload1" type="button"  onclick="restore_cert();" class="btn btn-danger">上传并恢复 <i class="icon-cloud"></i></button>' }
+				]);
+			</script>
+		</div>
+	</div>	
+	<div class="box boxr6">
 		<div class="heading">状态日志</div>
 		<div class="content">
 			<div class="section kp_log content">
@@ -498,7 +550,6 @@ No part of this file may be used without permission.
 					y = Math.floor(docu.getViewSize().height * 0.55);
 					s = 'height:' + ((y > 300) ? y : 300) + 'px;display:block';
 					$('.section.kp_log').append('<textarea class="as-script" name="koolproxy_log" id="_koolproxy_log" wrap="off" style="max-width:100%; min-width: 100%; margin: 0; ' + s + '" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>');
-
 				</script>
 			</div>
 		</div>
@@ -510,6 +561,5 @@ No part of this file may be used without permission.
 	<div id="msg_error" class="alert alert-error icon" style="display:none;">
 	</div>
 	<button type="button" value="Save" id="save-button" onclick="save()" class="btn btn-primary">保存 <i class="icon-check"></i></button>
-	<button type="button" value="Cancel" id="cancel-button" onclick="javascript:reloadPage();" class="btn">取消 <i class="icon-cancel"></i></button>
 	<script type="text/javascript">init_kp();</script>
 </content>
